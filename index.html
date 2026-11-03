@@ -113,7 +113,7 @@ h2 { font: 800 22px/1.1 var(--display); margin: 0 0 4px; text-transform: upperca
   <header>
     <div class="eyebrow">Vinilo microperforado · Renault Duster</div>
     <h1>La Duster de <span>Flower Miel</span></h1>
-    <p class="lead">Así se vería la camioneta de don Samuel con las tres piezas puestas. Arrastra la foto hacia los lados para darle la vuelta al carro, usa las flechas o toca una miniatura.</p>
+    <p class="lead">Así se vería la Duster Dynamique de don Samuel con las tres piezas puestas: el vidrio trasero y los dos vidrios fijos pequeños de atrás. Arrastra la foto hacia los lados para darle la vuelta al carro, usa las flechas o toca una miniatura.</p>
   </header>
 
   <section class="visor" aria-label="Visor de la camioneta">
@@ -137,11 +137,11 @@ h2 { font: 800 22px/1.1 var(--display); margin: 0 0 4px; text-transform: upperca
       </figure>
       <figure class="pieza">
         <img src="img/productos.jpg" alt="Diseño del lateral de productos: miel, polen y propóleo" loading="lazy">
-        <figcaption><strong>Puerta trasera derecha · productos</strong><span class="medida">46 × 30 cm</span><a class="pdf" href="descargas/vidrio-lateral-productos-46x30cm.pdf" download>Descargar PDF de imprenta</a></figcaption>
+        <figcaption><strong>Vidrio pequeño trasero derecho · productos</strong><span class="medida">46 × 30 cm</span><a class="pdf" href="descargas/vidrio-lateral-productos-46x30cm.pdf" download>Descargar PDF de imprenta</a></figcaption>
       </figure>
       <figure class="pieza">
         <img src="img/equipos.jpg" alt="Diseño del lateral de equipos apícolas" loading="lazy">
-        <figcaption><strong>Puerta trasera izquierda · equipos</strong><span class="medida">46 × 30 cm</span><a class="pdf" href="descargas/vidrio-lateral-equipos-46x30cm.pdf" download>Descargar PDF de imprenta</a></figcaption>
+        <figcaption><strong>Vidrio pequeño trasero izquierdo · equipos</strong><span class="medida">46 × 30 cm</span><a class="pdf" href="descargas/vidrio-lateral-equipos-46x30cm.pdf" download>Descargar PDF de imprenta</a></figcaption>
       </figure>
     </div>
   </section>
@@ -156,13 +156,13 @@ h2 { font: 800 22px/1.1 var(--display); margin: 0 0 4px; text-transform: upperca
 (function () {
   // Ángulos en orden alrededor del carro: arrastrar avanza o retrocede como si se le diera la vuelta.
   var VISTAS = [
-    { src: "img/angulo-frente-derecha.jpg", nombre: "3/4 delantera derecha", texto: "Frente y costado derecho: el vinilo de productos en la puerta trasera." },
-    { src: "img/angulo-lado-derecho.jpg", nombre: "Lado derecho", texto: "Perfil del lado del pasajero, con el vinilo de productos." },
-    { src: "img/vista-derecha.jpg", nombre: "3/4 trasera derecha", texto: "Vidrio trasero y lateral de productos, en una calle de Medellín." },
+    { src: "img/angulo-frente-derecha.jpg", nombre: "3/4 delantera derecha", texto: "Frente y costado derecho: el vinilo de productos en el vidrio pequeño de atrás." },
+    { src: "img/angulo-lado-derecho.jpg", nombre: "Lado derecho", texto: "Perfil del lado del pasajero: productos en el vidrio fijo pequeño de atrás." },
+    { src: "img/vista-derecha.jpg", nombre: "3/4 trasera derecha", texto: "Vidrio trasero y vidrio pequeño derecho con productos, en una calle de Medellín." },
     { src: "img/angulo-atras.jpg", nombre: "Atrás", texto: "El vidrio trasero completo, como lo ve el carro de atrás." },
     { src: "img/angulo-detalle-trasero.jpg", nombre: "Detalle trasero", texto: "De cerca: teléfono, Instagram y mensajes del vidrio trasero." },
-    { src: "img/vista-izquierda.jpg", nombre: "3/4 trasera izquierda", texto: "Vidrio trasero y lateral de equipos, junto al apiario." },
-    { src: "img/angulo-lado-izquierdo.jpg", nombre: "Lado izquierdo", texto: "Perfil del lado del conductor, con el vinilo de equipos." }
+    { src: "img/vista-izquierda.jpg", nombre: "3/4 trasera izquierda", texto: "Vidrio trasero y vidrio pequeño izquierdo con equipos, junto al apiario." },
+    { src: "img/angulo-lado-izquierdo.jpg", nombre: "Lado izquierdo", texto: "Perfil del lado del conductor: equipos en el vidrio fijo pequeño de atrás." }
   ];
   var stage = document.getElementById("stage");
   var minis = document.getElementById("minis");
