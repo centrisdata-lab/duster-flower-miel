@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Duster Flower Miel v2</title>
+<meta name="description" content="Así se vería la Renault Duster de Flower Miel con los vinilos microperforados en sus vidrios, desde varios ángulos, y los PDF de imprenta.">
+<meta property="og:title" content="La Duster de Flower Miel">
+<meta property="og:description" content="Mira la camioneta desde todos los ángulos con los vinilos puestos.">
+<meta property="og:image" content="img/vista-derecha.jpg">
+<link rel="canonical" href="https://centrisdata-lab.github.io/duster-flower-miel/version-2/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;800;900&family=Quicksand:wght@500;600;700&display=swap">
+<style>
+/* Layout: visor grande de la camioneta que se gira arrastrando entre sus ángulos, tira de miniaturas, y debajo las tres piezas con su PDF. */
+:root {
+  --bg: #fffaf1;
+  --surface: #ffffff;
+  --ink: #2b1a05;
+  --muted: #6e5a3f;
+  --line: #ecdcbf;
+  --amber: #e8960c;
+  --amber-soft: #fbe3b5;
+  --green: #3f7d3a;
+  --display: "Poppins", "Segoe UI", system-ui, sans-serif;
+  --body: "Quicksand", "Segoe UI", system-ui, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1d1407; --surface: #2a1d0b; --ink: #fbefd9; --muted: #c9b48f;
+    --line: #4a3618; --amber: #f2b544; --amber-soft: #4a340d; --green: #7fbf72;
+    color-scheme: dark;
+  }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 24px 56px;
+}
+img { max-width: 100%; }
+.wrap { max-width: 1080px; margin: 0 auto; display: grid; gap: 40px; }
+header { display: grid; gap: 6px; }
+.versiones { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 6px; }
+.versiones a { font: 700 14px/1 var(--body); color: var(--ink); text-decoration: none; padding: 11px 16px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--surface); min-height: 44px; display: inline-flex; align-items: center; }
+.versiones a[aria-current="page"] { background: var(--green); border-color: var(--green); color: #fffaf1; }
+.versiones a:focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; }
+.eyebrow { font: 700 13px/1 var(--body); letter-spacing: .14em; text-transform: uppercase; color: var(--green); }
+h1 { font: 900 clamp(28px, 5vw, 46px)/1.02 var(--display); margin: 0; text-transform: uppercase; text-wrap: balance; }
+h1 span { color: var(--amber); }
+.lead { margin: 4px 0 0; color: var(--muted); max-width: 64ch; }
+
+/* Visor */
+.visor { display: grid; gap: 12px; }
+.stage {
+  position: relative; aspect-ratio: 4 / 3; max-width: 100%; border-radius: 22px; overflow: hidden;
+  background: var(--surface); border: 1px solid var(--line); cursor: grab; touch-action: pan-y; user-select: none;
+}
+.stage.arrastrando { cursor: grabbing; }
+.stage img {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none;
+  transition: opacity .35s ease; -webkit-user-drag: none; opacity: 0;
+}
+.stage img.activa { opacity: 1; }
+.flecha {
+  position: absolute; top: 50%; transform: translateY(-50%); width: 48px; height: 48px; border-radius: 50%;
+  border: 0; background: rgba(43, 26, 5, .7); color: #fffaf1; font: 700 22px/1 var(--display); cursor: pointer;
+  display: grid; place-items: center;
+}
+.flecha.izq { left: 12px; } .flecha.der { right: 12px; }
+.flecha:focus-visible, .mini:focus-visible, .stage:focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; }
+.etiqueta {
+  position: absolute; left: 14px; top: 14px; background: rgba(43, 26, 5, .78); color: #fffaf1;
+  font: 700 13px/1 var(--body); padding: 9px 13px; border-radius: 999px; pointer-events: none;
+}
+.pista {
+  position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%);
+  background: rgba(43, 26, 5, .78); color: #fffaf1; font: 700 13px/1 var(--body); padding: 9px 14px; border-radius: 999px;
+  white-space: nowrap; pointer-events: none; transition: opacity .4s;
+}
+.pista.oculta { opacity: 0; }
+.minis { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; }
+.mini {
+  padding: 0; border: 2px solid transparent; border-radius: 10px; overflow: hidden; background: var(--surface);
+  cursor: pointer; aspect-ratio: 4 / 3; display: block;
+}
+.mini img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.mini[aria-pressed="true"] { border-color: var(--amber); }
+.leyenda { color: var(--muted); font-size: 14px; margin: 0; }
+
+/* Piezas */
+h2 { font: 800 22px/1.1 var(--display); margin: 0 0 4px; text-transform: uppercase; }
+.sub { color: var(--muted); margin: 0 0 18px; font-size: 15px; }
+.piezas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.pieza { margin: 0; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.pieza.ancha { grid-column: 1 / -1; }
+.pieza img { width: 100%; border-radius: 12px; border: 1px solid var(--line); display: block; }
+.pieza figcaption { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: baseline; justify-content: space-between; }
+.pieza strong { font: 800 15px/1.2 var(--display); }
+.medida { font: 700 13px/1 var(--body); font-variant-numeric: tabular-nums; background: var(--amber-soft); padding: 6px 10px; border-radius: 999px; white-space: nowrap; }
+.pdf { flex-basis: 100%; font: 700 14px/1 var(--body); color: var(--green); text-decoration: underline; text-underline-offset: 3px; padding-block: 8px; }
+.pdf:focus-visible { outline: 3px solid var(--green); outline-offset: 2px; border-radius: 4px; }
+.nota { border-top: 1px solid var(--line); padding-top: 18px; color: var(--muted); font-size: 14px; max-width: 78ch; }
+.nota p { margin: 0 0 8px; }
+@media (max-width: 640px) {
+  .piezas { grid-template-columns: 1fr; }
+  .minis { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .pista { font-size: 12px; }
+  .flecha { width: 40px; height: 40px; font-size: 18px; }
+}
+@media (prefers-reduced-motion: reduce) { .stage img { transition: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <nav class="versiones" aria-label="Versiones">
+      <a href="../">Versión 1 · laterales rectangulares</a>
+      <a href="./" aria-current="page">Versión 2 · laterales con la forma del vidrio</a>
+    </nav>
+    <div class="eyebrow">Versión 2 · Vinilo microperforado · Renault Duster</div>
+    <h1>La Duster de <span>Flower Miel</span></h1>
+    <p class="lead">Versión 2: los dos laterales rediseñados con la forma real del vidrio fijo pequeño de atrás, para que nada se corte al instalarlos. El vidrio trasero es el mismo de la versión 1. Arrastra la foto hacia los lados para darle la vuelta al carro, usa las flechas o toca una miniatura.</p>
+  </header>
+
+  <section class="visor" aria-label="Visor de la camioneta">
+    <div class="stage" id="stage" tabindex="0" aria-label="Camioneta: arrastra o usa las flechas del teclado para cambiar de ángulo">
+      <div class="etiqueta" id="etiqueta"></div>
+      <button type="button" class="flecha izq" id="ant" aria-label="Ángulo anterior">‹</button>
+      <button type="button" class="flecha der" id="sig" aria-label="Ángulo siguiente">›</button>
+      <div class="pista" id="pista">⟷ Arrastra para girar el carro</div>
+    </div>
+    <div class="minis" id="minis" role="group" aria-label="Ángulos"></div>
+    <p class="leyenda" id="leyenda"></p>
+  </section>
+
+  <section>
+    <h2>Las tres piezas</h2>
+    <p class="sub">Medidas finales de cada vidrio. Cada PDF lleva 1,5 cm de sobrante por lado. Los laterales traen además una guía de corte con el contorno del vidrio.</p>
+    <div class="piezas">
+      <figure class="pieza ancha">
+        <img src="../img/trasero.jpg" alt="Diseño del vidrio trasero: reubicación y preservación de polinizadores, contacto y apiturismo en San Antonio de Prado" loading="lazy">
+        <figcaption><strong>Vidrio trasero</strong><span class="medida">115 × 44 cm</span><a class="pdf" href="../descargas/vidrio-trasero-115x44cm.pdf" download>Descargar PDF de imprenta</a></figcaption>
+      </figure>
+      <figure class="pieza">
+        <img src="img/productos.jpg" alt="Diseño del lateral de productos: miel, polen y propóleo" loading="lazy">
+        <figcaption><strong>Vidrio pequeño trasero derecho · productos</strong><span class="medida">46 × 30 cm</span><a class="pdf" href="descargas/vidrio-lateral-productos-46x30cm-v2.pdf" download>Descargar PDF de imprenta</a><a class="pdf" href="descargas/vidrio-lateral-productos-46x30cm-v2-guia-de-corte.pdf" download>Descargar guía de corte</a></figcaption>
+      </figure>
+      <figure class="pieza">
+        <img src="img/equipos.jpg" alt="Diseño del lateral de equipos apícolas" loading="lazy">
+        <figcaption><strong>Vidrio pequeño trasero izquierdo · equipos</strong><span class="medida">46 × 30 cm</span><a class="pdf" href="descargas/vidrio-lateral-equipos-46x30cm-v2.pdf" download>Descargar PDF de imprenta</a><a class="pdf" href="descargas/vidrio-lateral-equipos-46x30cm-v2-guia-de-corte.pdf" download>Descargar guía de corte</a></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <div class="nota">
+    <p>En esta versión los laterales siguen la forma del vidrio fijo pequeño (sacada de una foto de perfil de una Duster Dynamique y ajustada a 46 × 30 cm). Todo el contenido queda al menos 1,5 cm dentro del borde, y el fondo sigue por fuera como sobrante. La guía de corte muestra el contorno en rosado. Antes de imprimir, conviene que el instalador compare la guía con el vidrio real (por ejemplo, calcando el vidrio en papel).</p>
+    <p>Las fotos del carro son una simulación hecha con IA para tener una idea del resultado: la placa, el entorno y algunos textos pequeños son inventados. Los archivos de imprenta son los PDF de arriba.</p>
+  </div>
+</div>
+
+<script>
+(function () {
+  // Ángulos en orden alrededor del carro: arrastrar avanza o retrocede como si se le diera la vuelta.
+  var VISTAS = [
+    { src: "img/angulo-frente-derecha.jpg", nombre: "3/4 delantera derecha", texto: "Frente y costado derecho: el vinilo de productos en el vidrio pequeño de atrás." },
+    { src: "img/angulo-lado-derecho.jpg", nombre: "Lado derecho", texto: "Perfil del lado del pasajero: productos en el vidrio fijo pequeño de atrás." },
+    { src: "img/vista-derecha.jpg", nombre: "3/4 trasera derecha", texto: "Vidrio trasero y vidrio pequeño derecho con productos, en una calle de Medellín." },
+    { src: "../img/angulo-atras.jpg", nombre: "Atrás", texto: "El vidrio trasero completo, como lo ve el carro de atrás." },
+    { src: "../img/angulo-detalle-trasero.jpg", nombre: "Detalle trasero", texto: "De cerca: teléfono, Instagram y mensajes del vidrio trasero." },
+    { src: "img/vista-izquierda.jpg", nombre: "3/4 trasera izquierda", texto: "Vidrio trasero y vidrio pequeño izquierdo con equipos, junto al apiario." },
+    { src: "img/angulo-lado-izquierdo.jpg", nombre: "Lado izquierdo", texto: "Perfil del lado del conductor: equipos en el vidrio fijo pequeño de atrás." }
+  ];
+  var stage = document.getElementById("stage");
+  var minis = document.getElementById("minis");
+  var etiqueta = document.getElementById("etiqueta");
+  var leyenda = document.getElementById("leyenda");
+  var pista = document.getElementById("pista");
+  var imgs = [], botones = [], actual = 0;
+
+  VISTAS.forEach(function (v, i) {
+    var im = document.createElement("img");
+    im.src = v.src; im.alt = "Duster de Flower Miel: " + v.nombre;
+    if (i > 1) im.loading = "lazy";
+    stage.insertBefore(im, etiqueta); imgs.push(im);
+    var b = document.createElement("button");
+    b.type = "button"; b.className = "mini"; b.setAttribute("aria-label", v.nombre);
+    b.innerHTML = '<img src="' + v.src + '" alt="" loading="lazy">';
+    b.addEventListener("click", function () { mostrar(i); });
+    minis.appendChild(b); botones.push(b);
+  });
+  minis.style.gridTemplateColumns = window.matchMedia("(max-width: 640px)").matches ? "" : "repeat(" + VISTAS.length + ", minmax(0, 1fr))";
+
+  function mostrar(i) {
+    actual = (i + VISTAS.length) % VISTAS.length;
+    imgs.forEach(function (im, k) { im.classList.toggle("activa", k === actual); });
+    botones.forEach(function (b, k) { b.setAttribute("aria-pressed", k === actual ? "true" : "false"); });
+    etiqueta.textContent = VISTAS[actual].nombre;
+    leyenda.textContent = VISTAS[actual].texto;
+    var sig = imgs[(actual + 1) % imgs.length]; if (sig.loading === "lazy") sig.loading = "eager";
+  }
+  document.getElementById("ant").addEventListener("click", function () { mostrar(actual - 1); });
+  document.getElementById("sig").addEventListener("click", function () { mostrar(actual + 1); });
+  stage.addEventListener("keydown", function (e) {
+    if (e.key === "ArrowLeft") { e.preventDefault(); mostrar(actual - 1); }
+    if (e.key === "ArrowRight") { e.preventDefault(); mostrar(actual + 1); }
+  });
+
+  // Arrastrar: cada tramo de ~15 % del ancho cambia al ángulo vecino.
+  var inicio = null;
+  stage.addEventListener("pointerdown", function (e) {
+    if (e.target.closest(".flecha")) return;
+    inicio = e.clientX; stage.classList.add("arrastrando");
+    try { stage.setPointerCapture(e.pointerId); } catch (_) {}
+  });
+  stage.addEventListener("pointermove", function (e) {
+    if (inicio === null) return;
+    var dx = (e.clientX - inicio) / stage.getBoundingClientRect().width;
+    if (Math.abs(dx) > 0.15) { mostrar(actual + (dx < 0 ? 1 : -1)); inicio = e.clientX; pista.classList.add("oculta"); }
+  });
+  function soltar() { inicio = null; stage.classList.remove("arrastrando"); }
+  stage.addEventListener("pointerup", soltar);
+  stage.addEventListener("pointercancel", soltar);
+
+  mostrar(2);
+})();
+</script>
+</body>
+</html>
