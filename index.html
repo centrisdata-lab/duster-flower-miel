@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Duster Flower Miel</title>
-<meta name="description" content="Modelo 3D de la Renault Duster de Flower Miel con los vinilos microperforados en sus vidrios, y los PDF de imprenta.">
+<meta name="description" content="Así se vería la Renault Duster de Flower Miel con los vinilos microperforados en sus vidrios, desde varios ángulos, y los PDF de imprenta.">
 <meta property="og:title" content="La Duster de Flower Miel">
-<meta property="og:description" content="Gira la camioneta en 3D y mira cómo quedan los vinilos en sus vidrios.">
+<meta property="og:description" content="Mira la camioneta desde todos los ángulos con los vinilos puestos.">
 <meta property="og:image" content="img/vista-derecha.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;800;900&family=Quicksand:wght@500;600;700&display=swap">
 <style>
-/* Layout: el modelo 3D de la camioneta ocupa el primer pantallazo; debajo, las tres piezas con su PDF y las fotos simuladas. */
+/* Layout: visor grande de la camioneta que se gira arrastrando entre sus ángulos, tira de miniaturas, y debajo las tres piezas con su PDF. */
 :root {
   --bg: #fffaf1;
   --surface: #ffffff;
@@ -21,7 +21,6 @@
   --amber: #e8960c;
   --amber-soft: #fbe3b5;
   --green: #3f7d3a;
-  --stage: #efe6d6;
   --display: "Poppins", "Segoe UI", system-ui, sans-serif;
   --body: "Quicksand", "Segoe UI", system-ui, sans-serif;
   color-scheme: light;
@@ -29,7 +28,7 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --bg: #1d1407; --surface: #2a1d0b; --ink: #fbefd9; --muted: #c9b48f;
-    --line: #4a3618; --amber: #f2b544; --amber-soft: #4a340d; --green: #7fbf72; --stage: #2c2112;
+    --line: #4a3618; --amber: #f2b544; --amber-soft: #4a340d; --green: #7fbf72;
     color-scheme: dark;
   }
 }
@@ -41,25 +40,35 @@ body {
   padding-block: 24px 56px;
 }
 img { max-width: 100%; }
-.wrap { max-width: 1120px; margin: 0 auto; display: grid; gap: 40px; }
+.wrap { max-width: 1080px; margin: 0 auto; display: grid; gap: 40px; }
 header { display: grid; gap: 6px; }
 .eyebrow { font: 700 13px/1 var(--body); letter-spacing: .14em; text-transform: uppercase; color: var(--green); }
 h1 { font: 900 clamp(28px, 5vw, 46px)/1.02 var(--display); margin: 0; text-transform: uppercase; text-wrap: balance; }
 h1 span { color: var(--amber); }
 .lead { margin: 4px 0 0; color: var(--muted); max-width: 64ch; }
 
-/* Visor 3D */
+/* Visor */
 .visor { display: grid; gap: 12px; }
 .stage {
-  position: relative; width: 100%; aspect-ratio: 16 / 10; max-height: 78vh; min-height: 360px;
-  border-radius: 22px; overflow: hidden; background: var(--stage); border: 1px solid var(--line);
-  touch-action: none; cursor: grab;
+  position: relative; aspect-ratio: 4 / 3; max-width: 100%; border-radius: 22px; overflow: hidden;
+  background: var(--surface); border: 1px solid var(--line); cursor: grab; touch-action: pan-y; user-select: none;
 }
-.stage:active { cursor: grabbing; }
-.stage canvas { display: block; width: 100%; height: 100%; }
-.cargando {
-  position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted);
-  font: 700 15px/1.3 var(--body); text-align: center; padding: 20px;
+.stage.arrastrando { cursor: grabbing; }
+.stage img {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none;
+  transition: opacity .35s ease; -webkit-user-drag: none; opacity: 0;
+}
+.stage img.activa { opacity: 1; }
+.flecha {
+  position: absolute; top: 50%; transform: translateY(-50%); width: 48px; height: 48px; border-radius: 50%;
+  border: 0; background: rgba(43, 26, 5, .7); color: #fffaf1; font: 700 22px/1 var(--display); cursor: pointer;
+  display: grid; place-items: center;
+}
+.flecha.izq { left: 12px; } .flecha.der { right: 12px; }
+.flecha:focus-visible, .mini:focus-visible, .stage:focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; }
+.etiqueta {
+  position: absolute; left: 14px; top: 14px; background: rgba(43, 26, 5, .78); color: #fffaf1;
+  font: 700 13px/1 var(--body); padding: 9px 13px; border-radius: 999px; pointer-events: none;
 }
 .pista {
   position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%);
@@ -67,14 +76,13 @@ h1 span { color: var(--amber); }
   white-space: nowrap; pointer-events: none; transition: opacity .4s;
 }
 .pista.oculta { opacity: 0; }
-.controles { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-.controles button {
-  font: 700 14px/1 var(--body); color: var(--ink); background: var(--surface); border: 1.5px solid var(--line);
-  padding: 11px 15px; border-radius: 999px; cursor: pointer; min-height: 44px;
+.minis { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; }
+.mini {
+  padding: 0; border: 2px solid transparent; border-radius: 10px; overflow: hidden; background: var(--surface);
+  cursor: pointer; aspect-ratio: 4 / 3; display: block;
 }
-.controles button[aria-pressed="true"] { background: var(--amber); border-color: var(--amber); color: #2b1a05; }
-.controles button:focus-visible { outline: 3px solid var(--green); outline-offset: 3px; }
-.controles .sep { flex: 1 1 auto; }
+.mini img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.mini[aria-pressed="true"] { border-color: var(--amber); }
 .leyenda { color: var(--muted); font-size: 14px; margin: 0; }
 
 /* Piezas */
@@ -89,46 +97,34 @@ h2 { font: 800 22px/1.1 var(--display); margin: 0 0 4px; text-transform: upperca
 .medida { font: 700 13px/1 var(--body); font-variant-numeric: tabular-nums; background: var(--amber-soft); padding: 6px 10px; border-radius: 999px; white-space: nowrap; }
 .pdf { flex-basis: 100%; font: 700 14px/1 var(--body); color: var(--green); text-decoration: underline; text-underline-offset: 3px; padding-block: 8px; }
 .pdf:focus-visible { outline: 3px solid var(--green); outline-offset: 2px; border-radius: 4px; }
-.fotos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
-.fotos img { width: 100%; border-radius: 12px; border: 1px solid var(--line); display: block; }
 .nota { border-top: 1px solid var(--line); padding-top: 18px; color: var(--muted); font-size: 14px; max-width: 78ch; }
 .nota p { margin: 0 0 8px; }
 @media (max-width: 640px) {
-  .piezas, .fotos { grid-template-columns: 1fr; }
-  .stage { aspect-ratio: 4 / 5; }
+  .piezas { grid-template-columns: 1fr; }
+  .minis { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .pista { font-size: 12px; }
+  .flecha { width: 40px; height: 40px; font-size: 18px; }
 }
+@media (prefers-reduced-motion: reduce) { .stage img { transition: none; } }
 </style>
-<script type="importmap">
-{ "imports": {
-  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
-} }
-</script>
 </head>
 <body>
 <div class="wrap">
   <header>
     <div class="eyebrow">Vinilo microperforado · Renault Duster</div>
     <h1>La Duster de <span>Flower Miel</span></h1>
-    <p class="lead">Modelo 3D de la camioneta con los tres vinilos puestos en sus vidrios, a su medida real. Arrastra para girarla, usa la rueda del mouse o pellizca para acercarte, y elige una vista con los botones.</p>
+    <p class="lead">Así se vería la camioneta de don Samuel con las tres piezas puestas. Arrastra la foto hacia los lados para darle la vuelta al carro, usa las flechas o toca una miniatura.</p>
   </header>
 
-  <section class="visor" aria-label="Modelo 3D de la camioneta">
-    <div class="stage" id="stage">
-      <div class="cargando" id="cargando">Cargando el modelo 3D…</div>
-      <div class="pista" id="pista">⟲ Arrastra para girar · pellizca o usa la rueda para acercar</div>
+  <section class="visor" aria-label="Visor de la camioneta">
+    <div class="stage" id="stage" tabindex="0" aria-label="Camioneta: arrastra o usa las flechas del teclado para cambiar de ángulo">
+      <div class="etiqueta" id="etiqueta"></div>
+      <button type="button" class="flecha izq" id="ant" aria-label="Ángulo anterior">‹</button>
+      <button type="button" class="flecha der" id="sig" aria-label="Ángulo siguiente">›</button>
+      <div class="pista" id="pista">⟷ Arrastra para girar el carro</div>
     </div>
-    <div class="controles" role="group" aria-label="Vistas">
-      <button type="button" data-vista="trasera34" aria-pressed="true">3/4 trasera</button>
-      <button type="button" data-vista="atras" aria-pressed="false">Atrás</button>
-      <button type="button" data-vista="derecha" aria-pressed="false">Lado derecho</button>
-      <button type="button" data-vista="izquierda" aria-pressed="false">Lado izquierdo</button>
-      <button type="button" data-vista="frente34" aria-pressed="false">3/4 delantera</button>
-      <span class="sep"></span>
-      <button type="button" id="girar" aria-pressed="true">Girar sola</button>
-    </div>
-    <p class="leyenda" id="leyenda">Vidrio trasero 115 × 44 cm · productos en la puerta trasera derecha · equipos en la izquierda (46 × 30 cm cada uno).</p>
+    <div class="minis" id="minis" role="group" aria-label="Ángulos"></div>
+    <p class="leyenda" id="leyenda"></p>
   </section>
 
   <section>
@@ -150,373 +146,77 @@ h2 { font: 800 22px/1.1 var(--display); margin: 0 0 4px; text-transform: upperca
     </div>
   </section>
 
-  <section>
-    <h2>Fotos simuladas</h2>
-    <p class="sub">Simulación fotográfica hecha con IA, para tener una idea en un entorno real.</p>
-    <div class="fotos">
-      <img src="img/vista-derecha.jpg" alt="Foto simulada de la Duster por el lado derecho con los vinilos" loading="lazy">
-      <img src="img/vista-izquierda.jpg" alt="Foto simulada de la Duster por el lado izquierdo junto a un apiario" loading="lazy">
-    </div>
-  </section>
-
   <div class="nota">
-    <p>El modelo 3D respeta las medidas de la Duster (4,34 × 1,80 × 1,69 m) y de cada vidrio, para ver el tamaño real de los diseños sobre el carro; los detalles de carrocería son aproximados. Los PDF son a tamaño real y el instalador hace el recorte final sobre el vidrio: antes de imprimir, conviene que confirme las medidas en el carro.</p>
-    <p>Las fotos simuladas son de IA: la placa, el entorno y algunos textos pequeños son inventados. Los archivos de imprenta son los PDF de arriba.</p>
+    <p>Los PDF son a tamaño real con 1,5 cm de sobrante por lado; el instalador hace el recorte final sobre el vidrio. Antes de imprimir, conviene que confirme las medidas en el carro.</p>
+    <p>Las fotos del carro son una simulación hecha con IA para tener una idea del resultado: la placa, el entorno y algunos textos pequeños son inventados. Los archivos de imprenta son los PDF de arriba.</p>
   </div>
 </div>
 
-<script type="module">
-import * as THREE from "three";
-import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+<script>
+(function () {
+  // Ángulos en orden alrededor del carro: arrastrar avanza o retrocede como si se le diera la vuelta.
+  var VISTAS = [
+    { src: "img/angulo-frente-derecha.jpg", nombre: "3/4 delantera derecha", texto: "Frente y costado derecho: el vinilo de productos en la puerta trasera." },
+    { src: "img/angulo-lado-derecho.jpg", nombre: "Lado derecho", texto: "Perfil del lado del pasajero, con el vinilo de productos." },
+    { src: "img/vista-derecha.jpg", nombre: "3/4 trasera derecha", texto: "Vidrio trasero y lateral de productos, en una calle de Medellín." },
+    { src: "img/angulo-atras.jpg", nombre: "Atrás", texto: "El vidrio trasero completo, como lo ve el carro de atrás." },
+    { src: "img/angulo-detalle-trasero.jpg", nombre: "Detalle trasero", texto: "De cerca: teléfono, Instagram y mensajes del vidrio trasero." },
+    { src: "img/vista-izquierda.jpg", nombre: "3/4 trasera izquierda", texto: "Vidrio trasero y lateral de equipos, junto al apiario." },
+    { src: "img/angulo-lado-izquierdo.jpg", nombre: "Lado izquierdo", texto: "Perfil del lado del conductor, con el vinilo de equipos." }
+  ];
+  var stage = document.getElementById("stage");
+  var minis = document.getElementById("minis");
+  var etiqueta = document.getElementById("etiqueta");
+  var leyenda = document.getElementById("leyenda");
+  var pista = document.getElementById("pista");
+  var imgs = [], botones = [], actual = 0;
 
-const stage = document.getElementById("stage");
-const pista = document.getElementById("pista");
-const oscuro = window.matchMedia("(prefers-color-scheme: dark)").matches;
-const reducir = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  VISTAS.forEach(function (v, i) {
+    var im = document.createElement("img");
+    im.src = v.src; im.alt = "Duster de Flower Miel: " + v.nombre;
+    if (i > 1) im.loading = "lazy";
+    stage.insertBefore(im, etiqueta); imgs.push(im);
+    var b = document.createElement("button");
+    b.type = "button"; b.className = "mini"; b.setAttribute("aria-label", v.nombre);
+    b.innerHTML = '<img src="' + v.src + '" alt="" loading="lazy">';
+    b.addEventListener("click", function () { mostrar(i); });
+    minis.appendChild(b); botones.push(b);
+  });
+  minis.style.gridTemplateColumns = window.matchMedia("(max-width: 640px)").matches ? "" : "repeat(" + VISTAS.length + ", minmax(0, 1fr))";
 
-// ---------- Escena ----------
-const renderer = new THREE.WebGLRenderer({ antialias: true });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.outputColorSpace = THREE.SRGBColorSpace;
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.0;
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-stage.prepend(renderer.domElement);
-
-const scene = new THREE.Scene();
-const fondo = new THREE.Color(oscuro ? 0x2c2112 : 0xefe6d6);
-scene.background = fondo;
-scene.fog = new THREE.Fog(fondo, 14, 30);
-const pmrem = new THREE.PMREMGenerator(renderer);
-scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-
-const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 100);
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
-controls.dampingFactor = 0.08;
-controls.minDistance = 2.6;
-controls.maxDistance = 12;
-controls.maxPolarAngle = Math.PI * 0.49;
-controls.minPolarAngle = Math.PI * 0.12;
-controls.enablePan = false;
-controls.autoRotate = !reducir;
-controls.autoRotateSpeed = 0.9;
-
-scene.add(new THREE.HemisphereLight(0xffffff, oscuro ? 0x3a2a14 : 0xcbb995, 0.6));
-const sol = new THREE.DirectionalLight(0xffffff, 2.0);
-sol.position.set(-3, 7, 4);
-sol.castShadow = true;
-sol.shadow.mapSize.set(2048, 2048);
-Object.assign(sol.shadow.camera, { left: -4, right: 4, top: 4, bottom: -4, near: 1, far: 20 });
-sol.shadow.bias = -0.0004;
-sol.shadow.radius = 4;
-scene.add(sol);
-
-const suelo = new THREE.Mesh(new THREE.CircleGeometry(16, 64), new THREE.MeshStandardMaterial({ color: oscuro ? 0x3a2c18 : 0xe2d6c0, roughness: 0.95 }));
-suelo.rotation.x = -Math.PI / 2;
-suelo.receiveShadow = true;
-scene.add(suelo);
-
-// sombra de contacto bajo el carro
-{
-  const c = document.createElement("canvas"); c.width = c.height = 256;
-  const g = c.getContext("2d"); const r = g.createRadialGradient(128, 128, 10, 128, 128, 128);
-  r.addColorStop(0, "rgba(0,0,0,0.55)"); r.addColorStop(1, "rgba(0,0,0,0)");
-  g.fillStyle = r; g.fillRect(0, 0, 256, 256);
-  const m = new THREE.Mesh(new THREE.PlaneGeometry(5.2, 2.6), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(c), transparent: true, depthWrite: false }));
-  m.rotation.x = -Math.PI / 2; m.position.y = 0.002; scene.add(m);
-}
-
-// ---------- Materiales ----------
-const pintura = new THREE.MeshPhysicalMaterial({ color: 0xf3f3f1, roughness: 0.32, metalness: 0.0, clearcoat: 1, clearcoatRoughness: 0.08 });
-const pinturaDoble = pintura.clone(); pinturaDoble.side = THREE.DoubleSide;
-const plastico = new THREE.MeshStandardMaterial({ color: 0x1c1c1e, roughness: 0.75 });
-const negroBrillo = new THREE.MeshPhysicalMaterial({ color: 0x111214, roughness: 0.2, clearcoat: 1 });
-const vidrio = new THREE.MeshPhysicalMaterial({ color: 0x0b1116, roughness: 0.04, metalness: 0.3, clearcoat: 1, side: THREE.DoubleSide });
-const marco = new THREE.MeshStandardMaterial({ color: 0x0d0d0f, roughness: 0.5, side: THREE.DoubleSide });
-const cromo = new THREE.MeshStandardMaterial({ color: 0xdadde0, roughness: 0.15, metalness: 1 });
-const llanta = new THREE.MeshStandardMaterial({ color: 0x151515, roughness: 0.9 });
-const rin = new THREE.MeshStandardMaterial({ color: 0xc4c7cb, roughness: 0.3, metalness: 0.85 });
-const rojo = new THREE.MeshStandardMaterial({ color: 0x7a0b10, emissive: 0x5a0508, roughness: 0.25, metalness: 0.1 });
-const faro = new THREE.MeshStandardMaterial({ color: 0xdfe6ee, emissive: 0x9fb4c8, emissiveIntensity: 0.25, roughness: 0.1, metalness: 0.6 });
-
-const carro = new THREE.Group();
-scene.add(carro);
-const sombra = (m) => { m.castShadow = true; m.receiveShadow = true; return m; };
-
-// ---------- Carrocería (x = largo, adelante +x; y = alto; z = ancho, lado derecho +z) ----------
-const ANCHO = 1.70, BISEL = 0.05;
-{
-  const s = new THREE.Shape();
-  s.moveTo(-2.12, 0.40);
-  s.lineTo(-1.86, 0.32);
-  s.lineTo(-1.84, 0.37);
-  s.absarc(-1.37, 0.37, 0.47, Math.PI, 0, true);   // paso de rueda trasero
-  s.lineTo(-0.88, 0.31);
-  s.lineTo(0.81, 0.31);
-  s.lineTo(0.83, 0.37);
-  s.absarc(1.30, 0.37, 0.47, Math.PI, 0, true);    // paso de rueda delantero
-  s.lineTo(1.79, 0.32);
-  s.lineTo(2.02, 0.35);
-  s.lineTo(2.17, 0.47);
-  s.lineTo(2.20, 0.66);
-  s.lineTo(2.15, 0.82);
-  s.lineTo(1.92, 0.93);
-  s.lineTo(0.98, 1.05);
-  s.lineTo(-2.01, 1.07);
-  s.lineTo(-2.12, 0.93);
-  s.lineTo(-2.15, 0.62);
-  s.closePath();
-  const g = new THREE.ExtrudeGeometry(s, { depth: ANCHO, bevelEnabled: true, bevelThickness: BISEL, bevelSize: BISEL, bevelSegments: 6, curveSegments: 32 });
-  g.translate(0, 0, -ANCHO / 2);
-  carro.add(sombra(new THREE.Mesh(g, pintura)));
-}
-// cabina (techo y pilares)
-const CAB = 1.52, CBISEL = 0.07;
-const ZC = CAB / 2 + CBISEL;          // cara lateral de la cabina
-{
-  const s = new THREE.Shape();
-  s.moveTo(-2.00, 1.00);
-  s.lineTo(0.92, 1.00);
-  s.lineTo(0.05, 1.57);
-  s.quadraticCurveTo(-0.95, 1.62, -1.87, 1.59);
-  s.lineTo(-2.02, 1.06);
-  s.closePath();
-  const g = new THREE.ExtrudeGeometry(s, { depth: CAB, bevelEnabled: true, bevelThickness: CBISEL, bevelSize: CBISEL, bevelSegments: 8, curveSegments: 24 });
-  g.translate(0, 0, -CAB / 2);
-  carro.add(sombra(new THREE.Mesh(g, pintura)));
-}
-
-// ---------- Utilidades ----------
-function plano(shape, mat) { return new THREE.Mesh(new THREE.ShapeGeometry(shape, 24), mat); }
-function poly(pts) { const s = new THREE.Shape(); s.moveTo(pts[0][0], pts[0][1]); pts.slice(1).forEach(p => s.lineTo(p[0], p[1])); s.closePath(); return s; }
-function rect(w, h, r) {
-  const s = new THREE.Shape(), x = -w / 2, y = -h / 2;
-  s.moveTo(x + r, y); s.lineTo(x + w - r, y); s.quadraticCurveTo(x + w, y, x + w, y + r);
-  s.lineTo(x + w, y + h - r); s.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-  s.lineTo(x + r, y + h); s.quadraticCurveTo(x, y + h, x, y + h - r);
-  s.lineTo(x, y + r); s.quadraticCurveTo(x, y, x + r, y);
-  return s;
-}
-function uvCaja(geo) {   // UV de 0 a 1 sobre el rectángulo que encierra la forma
-  geo.computeBoundingBox(); const b = geo.boundingBox, p = geo.attributes.position, uv = geo.attributes.uv;
-  for (let i = 0; i < p.count; i++) uv.setXY(i, (p.getX(i) - b.min.x) / (b.max.x - b.min.x), (p.getY(i) - b.min.y) / (b.max.y - b.min.y));
-  uv.needsUpdate = true; return geo;
-}
-// orienta una pieza plana: ejeX y ejeY en el plano, normal hacia afuera
-function orientar(m, ejeX, ejeY, centro) {
-  const z = new THREE.Vector3().crossVectors(ejeX, ejeY).normalize();
-  m.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(ejeX.clone().normalize(), ejeY.clone().normalize(), z));
-  m.position.copy(centro); return m;
-}
-const loader = new THREE.TextureLoader();
-function textura(url) {
-  const t = loader.load(url, () => listo());
-  t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = renderer.capabilities.getMaxAnisotropy(); return t;
-}
-function vinilo(tex) {
-  return new THREE.MeshStandardMaterial({ map: tex, roughness: 0.28, metalness: 0.05, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
-}
-let pendientes = 3;
-function listo() { if (--pendientes === 0) document.getElementById("cargando").remove(); }
-
-// ---------- Vidrios laterales (en coordenadas del perfil) ----------
-const DEL = poly([[0.62, 1.14], [-0.07, 1.14], [-0.07, 1.54], [0.02, 1.54]]);
-const CUARTO = poly([[-0.90, 1.25], [-1.73, 1.25], [-1.64, 1.54], [-0.90, 1.54]]);
-const PUERTA_T = { x: -0.47, y: 1.40, w: 0.46, h: 0.30 };      // vidrio de la puerta trasera: 46 × 30 cm
-const texProd = textura("img/productos-textura.jpg");
-const texEq = textura("img/equipos-textura.jpg");
-for (const lado of [1, -1]) {
-  const z = lado * (ZC + 0.003);
-  // marco negro de toda la línea de ventanas (incluye pilar B y C)
-  const banda = plano(poly([[0.70, 1.10], [-1.80, 1.10], [-1.69, 1.57], [0.03, 1.57]]), marco);
-  banda.position.z = lado * (ZC + 0.001); carro.add(banda);
-  // tapa de carrocería bajo la puerta trasera y el cuarto (la línea de cintura sube hacia atrás)
-  const cintura = plano(poly([[-0.17, 1.10], [-1.80, 1.10], [-1.76, 1.22], [-0.17, 1.22]]), pinturaDoble);
-  cintura.position.z = lado * (ZC + 0.0015); carro.add(cintura);
-  for (const forma of [DEL, CUARTO]) { const m = plano(forma, vidrio); m.position.z = z; carro.add(m); }
-  const vt = plano(rect(PUERTA_T.w + 0.02, PUERTA_T.h + 0.02, 0.04), vidrio);
-  vt.position.set(PUERTA_T.x, PUERTA_T.y, z); carro.add(vt);
-  // vinilo: productos a la derecha, equipos a la izquierda
-  const v = new THREE.Mesh(uvCaja(new THREE.ShapeGeometry(rect(PUERTA_T.w, PUERTA_T.h, 0.035), 16)), vinilo(lado > 0 ? texProd : texEq));
-  v.position.set(PUERTA_T.x, PUERTA_T.y, lado * (ZC + 0.006));
-  if (lado < 0) v.rotation.y = Math.PI;
-  carro.add(v);
-  // manijas, costuras de puertas, espejo, moldura inferior
-  for (const x of [0.30, -0.55]) {
-    const h = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.035, 0.03), plastico);
-    h.position.set(x, 0.98, lado * (ANCHO / 2 + BISEL + 0.005)); carro.add(h);
+  function mostrar(i) {
+    actual = (i + VISTAS.length) % VISTAS.length;
+    imgs.forEach(function (im, k) { im.classList.toggle("activa", k === actual); });
+    botones.forEach(function (b, k) { b.setAttribute("aria-pressed", k === actual ? "true" : "false"); });
+    etiqueta.textContent = VISTAS[actual].nombre;
+    leyenda.textContent = VISTAS[actual].texto;
+    var sig = imgs[(actual + 1) % imgs.length]; if (sig.loading === "lazy") sig.loading = "eager";
   }
-  for (const x of [0.93, -0.15, -1.00]) {
-    const c = new THREE.Mesh(new THREE.BoxGeometry(0.006, 0.66, 0.004), marco);
-    c.position.set(x, 0.74, lado * (ANCHO / 2 + BISEL + 0.001)); carro.add(c);
-  }
-  const esp = sombra(new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.13, 0.20), negroBrillo));
-  esp.position.set(0.74, 1.16, lado * (ZC + 0.12)); carro.add(esp);
-  const mold = sombra(new THREE.Mesh(new THREE.BoxGeometry(1.62, 0.13, 0.04), plastico));
-  mold.position.set(-0.03, 0.31, lado * (ANCHO / 2 + BISEL - 0.005)); carro.add(mold);
-  for (const x of [-1.37, 1.30]) {   // guardafangos negros
-    const t = sombra(new THREE.Mesh(new THREE.TorusGeometry(0.455, 0.05, 10, 40, Math.PI), plastico));
-    t.position.set(x, 0.37, lado * (ANCHO / 2 + BISEL - 0.02)); t.scale.z = 0.7; carro.add(t);
-  }
-  // calavera envolvente en el costado
-  const cal = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.14, 0.01), rojo);
-  cal.position.set(-2.03, 0.96, lado * (ANCHO / 2 + BISEL - 0.004)); carro.add(cal);
-}
+  document.getElementById("ant").addEventListener("click", function () { mostrar(actual - 1); });
+  document.getElementById("sig").addEventListener("click", function () { mostrar(actual + 1); });
+  stage.addEventListener("keydown", function (e) {
+    if (e.key === "ArrowLeft") { e.preventDefault(); mostrar(actual - 1); }
+    if (e.key === "ArrowRight") { e.preventDefault(); mostrar(actual + 1); }
+  });
 
-// ---------- Vidrio trasero con su vinilo (115 × 44 cm) ----------
-{
-  const abajo = new THREE.Vector2(-2.02, 1.06), arriba = new THREE.Vector2(-1.87, 1.59);
-  const dir = arriba.clone().sub(abajo).normalize();
-  const n = new THREE.Vector3(-dir.y, dir.x, 0);            // normal hacia atrás
-  if (n.x > 0) n.negate();
-  const ejeY = new THREE.Vector3(dir.x, dir.y, 0);
-  const ejeX = new THREE.Vector3(0, 0, 1);                   // visto desde atrás, la derecha es +z
-  const t = 0.58, base = new THREE.Vector3(abajo.x + (arriba.x - abajo.x) * t, abajo.y + (arriba.y - abajo.y) * t, 0);
-  const W = 1.15, H = 0.44, w = W / 2, h = H / 2;
-  const forma = new THREE.Shape();                            // arriba recto, abajo "medio volado"
-  forma.moveTo(-w + 0.03, h); forma.lineTo(w - 0.03, h); forma.quadraticCurveTo(w, h, w, h - 0.03);
-  forma.lineTo(w, 0.02); forma.bezierCurveTo(w, -0.14, w - 0.12, -h, w - 0.30, -h);
-  forma.lineTo(-w + 0.30, -h); forma.bezierCurveTo(-w + 0.12, -h, -w, -0.14, -w, 0.02);
-  forma.lineTo(-w, h - 0.03); forma.quadraticCurveTo(-w, h, -w + 0.03, h);
-  const fondoV = orientar(new THREE.Mesh(new THREE.ShapeGeometry(forma, 24), vidrio), ejeX, ejeY, base.clone().addScaledVector(n, CBISEL + 0.004));
-  fondoV.scale.set(1.04, 1.08, 1); carro.add(fondoV);
-  const v = orientar(new THREE.Mesh(uvCaja(new THREE.ShapeGeometry(forma, 32)), vinilo(textura("img/trasero-textura.jpg"))), ejeX, ejeY, base.clone().addScaledVector(n, CBISEL + 0.008));
-  carro.add(v);
-}
-// parabrisas
-{
-  const abajo = new THREE.Vector2(0.92, 1.00), arriba = new THREE.Vector2(0.05, 1.57);
-  const dir = arriba.clone().sub(abajo).normalize();
-  const n = new THREE.Vector3(dir.y, -dir.x, 0); if (n.x < 0) n.negate();
-  const centro = new THREE.Vector3(abajo.x + (arriba.x - abajo.x) * 0.55, abajo.y + (arriba.y - abajo.y) * 0.55, 0).addScaledVector(n, CBISEL + 0.004);
-  carro.add(orientar(plano(rect(1.40, 0.82, 0.06), vidrio), new THREE.Vector3(0, 0, -1), new THREE.Vector3(dir.x, dir.y, 0), centro));
-}
+  // Arrastrar: cada tramo de ~15 % del ancho cambia al ángulo vecino.
+  var inicio = null;
+  stage.addEventListener("pointerdown", function (e) {
+    if (e.target.closest(".flecha")) return;
+    inicio = e.clientX; stage.classList.add("arrastrando");
+    try { stage.setPointerCapture(e.pointerId); } catch (_) {}
+  });
+  stage.addEventListener("pointermove", function (e) {
+    if (inicio === null) return;
+    var dx = (e.clientX - inicio) / stage.getBoundingClientRect().width;
+    if (Math.abs(dx) > 0.15) { mostrar(actual + (dx < 0 ? 1 : -1)); inicio = e.clientX; pista.classList.add("oculta"); }
+  });
+  function soltar() { inicio = null; stage.classList.remove("arrastrando"); }
+  stage.addEventListener("pointerup", soltar);
+  stage.addEventListener("pointercancel", soltar);
 
-// ---------- Trasera ----------
-function canvasTex(w, h, dibujar) {
-  const c = document.createElement("canvas"); c.width = w; c.height = h; dibujar(c.getContext("2d"), w, h);
-  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t;
-}
-const XT = -2.15 - BISEL - 0.006;   // cara trasera
-function trasera(w, h, mat, y, z = 0) {
-  const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), mat);
-  m.rotation.y = -Math.PI / 2; m.position.set(XT, y, z); carro.add(m); return m;
-}
-trasera(1.05, 0.07, new THREE.MeshStandardMaterial({ roughness: 0.35, map: canvasTex(1024, 72, (g, w, h) => {
-  g.fillStyle = "#151515"; g.fillRect(0, 0, w, h); g.fillStyle = "#c9ccd0"; g.font = "600 46px Poppins, Arial";
-  g.textAlign = "center"; g.textBaseline = "middle"; g.letterSpacing = "38px"; g.fillText("DUSTER", w / 2 + 19, h / 2 + 2);
-}) }), 0.80);
-trasera(0.34, 0.12, new THREE.MeshStandardMaterial({ roughness: 0.4, map: canvasTex(512, 180, (g, w, h) => {
-  g.fillStyle = "#f6c315"; g.fillRect(0, 0, w, h); g.strokeStyle = "#111"; g.lineWidth = 8; g.strokeRect(6, 6, w - 12, h - 12);
-  g.fillStyle = "#111"; g.textAlign = "center"; g.font = "700 96px Arial"; g.fillText("FLW·026", w / 2, 110);
-  g.font = "700 30px Arial"; g.fillText("MEDELLÍN", w / 2, 158);
-}) }), 0.62);
-for (const lado of [1, -1]) {
-  const l = trasera(0.30, 0.13, rojo, 0.95, lado * 0.66);
-  const r = trasera(0.12, 0.04, faro, 0.92, lado * 0.66); r.position.x -= 0.002;
-}
-{ // rombo de Renault
-  const m = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.075, 0.075), cromo);
-  m.rotation.x = Math.PI / 4; m.position.set(XT - 0.004, 0.92, 0); carro.add(m);
-}
-{ // parachoques trasero y delantero
-  const pt = sombra(new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.22, ANCHO + 0.02), plastico));
-  pt.position.set(-2.16, 0.42, 0); carro.add(pt);
-  const pd = sombra(new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.17, ANCHO - 0.1), plastico));
-  pd.position.set(2.19, 0.44, 0); carro.add(pd);
-}
-
-// ---------- Frente ----------
-{
-  const XF = 2.20 + BISEL + 0.004;
-  const parrilla = new THREE.Mesh(new THREE.PlaneGeometry(0.95, 0.17), negroBrillo);
-  parrilla.rotation.y = Math.PI / 2; parrilla.position.set(XF - 0.01, 0.72, 0); carro.add(parrilla);
-  const barra = new THREE.Mesh(new THREE.BoxGeometry(0.01, 0.02, 0.95), cromo); barra.position.set(XF, 0.73, 0); carro.add(barra);
-  const logo = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.08, 0.08), cromo); logo.rotation.x = Math.PI / 4; logo.position.set(XF + 0.004, 0.73, 0); carro.add(logo);
-  for (const lado of [1, -1]) {
-    const f = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.08, 0.36), faro);
-    f.position.set(2.13, 0.84, lado * 0.62); f.rotation.z = -0.35; carro.add(f);
-  }
-}
-
-// ---------- Barras de techo y antena ----------
-for (const lado of [1, -1]) {
-  const r = sombra(new THREE.Mesh(new THREE.BoxGeometry(1.75, 0.035, 0.04), plastico));
-  r.position.set(-0.92, 1.71, lado * 0.60); carro.add(r);
-  for (const x of [-1.72, -0.12]) { const p = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.06, 0.05), plastico); p.position.set(x, 1.68, lado * 0.60); carro.add(p); }
-}
-{ const a = new THREE.Mesh(new THREE.CylinderGeometry(0.004, 0.008, 0.28, 8), plastico); a.position.set(-1.55, 1.80, 0); a.rotation.z = 0.5; carro.add(a); }
-
-// ---------- Ruedas ----------
-function rueda(x, lado) {
-  const g = new THREE.Group();
-  const tire = sombra(new THREE.Mesh(new THREE.TorusGeometry(0.255, 0.095, 20, 56), llanta)); tire.scale.z = 1.15; g.add(tire);
-  const disco = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.25, 0.17, 40), rin); disco.rotation.x = Math.PI / 2; g.add(disco);
-  const centro = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.20, 24), cromo); centro.rotation.x = Math.PI / 2; g.add(centro);
-  for (let i = 0; i < 6; i++) {   // ventanas del rin
-    const h = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.11, 0.02), plastico);
-    const a = (i / 6) * Math.PI * 2; h.position.set(Math.cos(a) * 0.16, Math.sin(a) * 0.16, 0.086); h.rotation.z = a + Math.PI / 2; g.add(h);
-  }
-  g.position.set(x, 0.35, lado * 0.80);
-  if (lado < 0) g.rotation.y = Math.PI;
-  carro.add(g);
-}
-for (const x of [1.30, -1.37]) for (const l of [1, -1]) rueda(x, l);
-
-// ---------- Vistas ----------
-const VISTAS = {
-  trasera34: { pos: [-4.9, 1.9, 3.9], obj: [-0.6, 0.95, 0] },
-  atras:     { pos: [-6.4, 1.45, 0],  obj: [-1.0, 1.05, 0] },
-  derecha:   { pos: [-0.5, 1.3, 6.3], obj: [-0.4, 0.9, 0] },
-  izquierda: { pos: [-0.5, 1.3, -6.3], obj: [-0.4, 0.9, 0] },
-  frente34:  { pos: [5.0, 1.9, 4.0],  obj: [0.3, 0.85, 0] },
-};
-camera.position.set(...VISTAS.trasera34.pos);
-controls.target.set(...VISTAS.trasera34.obj);
-let anim = null;
-function ir(nombre) {
-  const v = VISTAS[nombre]; if (!v) return;
-  anim = { t: 0, p0: camera.position.clone(), o0: controls.target.clone(), p1: new THREE.Vector3(...v.pos), o1: new THREE.Vector3(...v.obj) };
-  if (reducir) anim.t = 1;
-  document.querySelectorAll("[data-vista]").forEach(b => b.setAttribute("aria-pressed", b.dataset.vista === nombre ? "true" : "false"));
-  pararGiro();
-}
-document.querySelectorAll("[data-vista]").forEach(b => b.addEventListener("click", () => ir(b.dataset.vista)));
-const btnGirar = document.getElementById("girar");
-btnGirar.setAttribute("aria-pressed", String(controls.autoRotate));
-function pararGiro() { controls.autoRotate = false; btnGirar.setAttribute("aria-pressed", "false"); }
-btnGirar.addEventListener("click", () => { controls.autoRotate = !controls.autoRotate; btnGirar.setAttribute("aria-pressed", String(controls.autoRotate)); });
-controls.addEventListener("start", () => {
-  anim = null; pararGiro(); pista.classList.add("oculta");
-  document.querySelectorAll("[data-vista]").forEach(b => b.setAttribute("aria-pressed", "false"));
-});
-
-function ajustar() {
-  const r = stage.getBoundingClientRect();
-  renderer.setSize(r.width, r.height, false);
-  camera.aspect = r.width / r.height;
-  camera.fov = camera.aspect < 1 ? 46 : 32;
-  camera.updateProjectionMatrix();
-}
-new ResizeObserver(ajustar).observe(stage);
-ajustar();
-
-const suave = (t) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-const reloj = new THREE.Clock();
-renderer.setAnimationLoop(() => {
-  const dt = reloj.getDelta();
-  if (anim) {
-    anim.t = Math.min(1, anim.t + dt / 0.9); const k = suave(anim.t);
-    camera.position.lerpVectors(anim.p0, anim.p1, k); controls.target.lerpVectors(anim.o0, anim.o1, k);
-    if (anim.t >= 1) anim = null;
-  }
-  controls.update();
-  renderer.render(scene, camera);
-});
-window.__duster = { ir, renderer, camera, controls };
+  mostrar(2);
+})();
 </script>
 </body>
 </html>
