@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Orden de impresión Flower Miel</title>
+<meta name="description" content="Archivos aprobados y especificaciones para imprimir los vinilos microperforados de la Renault Duster de Flower Miel.">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;800;900&family=Quicksand:wght@500;600;700&display=swap">
+<style>
+/* Layout: hoja de trabajo para la litografía. Resumen y descarga arriba; una ficha por pieza; especificaciones e instalación al final. */
+:root {
+  --bg: #fffaf1;
+  --surface: #ffffff;
+  --ink: #2b1a05;
+  --muted: #6b5638;
+  --line: #ecdcbf;
+  --amber: #e8960c;
+  --amber-soft: #fbe3b5;
+  --green: #3f7d3a;
+  --corte: #d81b60;
+  --display: "Poppins", "Segoe UI", system-ui, sans-serif;
+  --body: "Quicksand", "Segoe UI", system-ui, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1d1407; --surface: #2a1d0b; --ink: #fbefd9; --muted: #c9b48f;
+    --line: #4a3618; --amber: #f2b544; --amber-soft: #4a340d; --green: #7fbf72; --corte: #ff6fa3;
+    color-scheme: dark;
+  }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 24px 56px;
+}
+img { max-width: 100%; display: block; }
+.wrap { max-width: 980px; margin: 0 auto; display: grid; gap: 36px; }
+.wrap > * { min-width: 0; }
+.versiones { display: flex; gap: 6px; flex-wrap: wrap; }
+.versiones a { font: 700 14px/1 var(--body); color: var(--ink); text-decoration: none; padding: 11px 16px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--surface); min-height: 44px; display: inline-flex; align-items: center; }
+.versiones a[aria-current="page"] { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+a:focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; }
+header { display: grid; gap: 8px; }
+.eyebrow { font: 700 13px/1 var(--body); letter-spacing: .14em; text-transform: uppercase; color: var(--green); }
+h1 { font: 900 clamp(28px, 5vw, 44px)/1.04 var(--display); margin: 0; text-transform: uppercase; text-wrap: balance; }
+h1 span { color: var(--amber); }
+.lead { margin: 0; color: var(--muted); max-width: 66ch; }
+h2 { font: 800 21px/1.15 var(--display); margin: 0 0 12px; text-transform: uppercase; }
+.estado { display: inline-flex; gap: 8px; align-items: center; font: 700 14px/1 var(--body); background: var(--green); color: #fffaf1; padding: 9px 14px; border-radius: 999px; width: fit-content; }
+
+/* Resumen */
+.tabla { overflow-x: auto; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: 15px; }
+th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font: 700 12px/1.2 var(--body); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+tr:last-child td { border-bottom: 0; }
+td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.zip {
+  display: inline-flex; gap: 10px; align-items: center; font: 800 16px/1 var(--display); text-decoration: none;
+  background: var(--amber); color: #2b1a05; padding: 16px 22px; border-radius: 999px; min-height: 52px; max-width: 100%; flex-wrap: wrap;
+}
+.zip small { font: 600 13px/1 var(--body); }
+
+/* Fichas */
+.pieza { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 20px; align-items: start; border-top: 1px solid var(--line); padding-top: 24px; }
+.pieza img { border-radius: 10px; border: 1px solid var(--line); }
+.pieza h3 { font: 800 18px/1.2 var(--display); margin: 0 0 4px; }
+.pieza .donde { color: var(--muted); margin: 0 0 12px; }
+dl { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; margin: 0 0 14px; font-size: 15px; }
+dt { color: var(--muted); }
+dd { margin: 0; font-variant-numeric: tabular-nums; }
+.links { display: flex; flex-wrap: wrap; gap: 8px; }
+.links a { font: 700 14px/1 var(--body); color: var(--ink); text-decoration: none; border: 1.5px solid var(--line); background: var(--surface); padding: 11px 14px; border-radius: 999px; min-height: 44px; display: inline-flex; align-items: center; }
+.links a.principal { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.corte { color: var(--corte); font-weight: 700; }
+
+/* Listas */
+ul.check { margin: 0; padding-left: 1.2em; display: grid; gap: 6px; max-width: 70ch; }
+.nota { border-left: 4px solid var(--amber); background: var(--surface); padding: 14px 16px; border-radius: 0 12px 12px 0; max-width: 72ch; }
+.nota p { margin: 0 0 6px; } .nota p:last-child { margin: 0; }
+footer { color: var(--muted); font-size: 14px; border-top: 1px solid var(--line); padding-top: 16px; }
+@media (max-width: 720px) { .pieza { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav class="versiones" aria-label="Páginas del proyecto">
+    <a href="../">Versión 1</a>
+    <a href="../version-2/">Versión 2 · mockup</a>
+    <a href="./" aria-current="page">Orden de impresión</a>
+  </nav>
+
+  <header>
+    <div class="eyebrow">Para la litografía · Vinilo microperforado</div>
+    <h1>Orden de impresión · <span>Flower Miel</span></h1>
+    <p class="lead">Tres piezas en vinilo microperforado para una Renault Duster Dynamique 2021 (primera generación). Diseño aprobado por el cliente. Abajo están los archivos, las medidas y las indicaciones de corte e instalación.</p>
+    <div class="estado">✓ Diseño aprobado · listo para imprimir</div>
+  </header>
+
+  <section aria-labelledby="t-resumen">
+    <h2 id="t-resumen">Resumen</h2>
+    <div class="tabla">
+      <table>
+        <thead><tr><th>Pieza</th><th>Vidrio</th><th>Medida final</th><th>Archivo con sobrante</th><th>Cant.</th></tr></thead>
+        <tbody>
+          <tr><td>1 · Trasero</td><td>Vidrio de la compuerta trasera</td><td class="num">115 × 44 cm</td><td class="num">118 × 47 cm</td><td class="num">1</td></tr>
+          <tr><td>2 · Productos</td><td>Vidrio fijo pequeño trasero, lado DERECHO (pasajero)</td><td class="num">46 × 30 cm (forma del vidrio)</td><td class="num">49 × 33 cm</td><td class="num">1</td></tr>
+          <tr><td>3 · Equipos</td><td>Vidrio fijo pequeño trasero, lado IZQUIERDO (conductor)</td><td class="num">46 × 30 cm (forma del vidrio)</td><td class="num">49 × 33 cm</td><td class="num">1</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p><a class="zip" href="descargas/flower-miel-microperforados.zip" download>⬇ Descargar todo en ZIP <small>(3 PDF de impresión, 2 guías de corte, los JPG y una ficha técnica)</small></a></p>
+  </section>
+
+  <section aria-labelledby="t-piezas">
+    <h2 id="t-piezas">Piezas</h2>
+
+    <article class="pieza">
+      <img src="img/trasero-pliego.jpg" alt="Pliego del vidrio trasero: reubicación y preservación de polinizadores, contacto y apiturismo" loading="lazy">
+      <div>
+        <h3>1 · Vidrio trasero</h3>
+        <p class="donde">Compuerta trasera.</p>
+        <dl>
+          <dt>Medida final</dt><dd>115 × 44 cm</dd>
+          <dt>Archivo</dt><dd>118 × 47 cm (1,5 cm de sobrante por lado)</dd>
+          <dt>Resolución</dt><dd>174 dpi a tamaño real</dd>
+          <dt>Corte</dt><dd>El borde inferior del vidrio es curvo: se recorta sobre el vidrio. En las esquinas de abajo solo hay fondo. Recortar también alrededor del limpiabrisas.</dd>
+        </dl>
+        <div class="links">
+          <a class="principal" href="../descargas/vidrio-trasero-115x44cm.pdf" download>PDF de impresión</a>
+        </div>
+      </div>
+    </article>
+
+    <article class="pieza">
+      <img src="img/productos-pliego.jpg" alt="Pliego del lateral de productos con la línea de corte en rosado" loading="lazy">
+      <div>
+        <h3>2 · Lateral productos</h3>
+        <p class="donde">Vidrio fijo pequeño trasero, <strong>lado derecho</strong> (detrás de la puerta trasera del pasajero).</p>
+        <dl>
+          <dt>Medida final</dt><dd>46 × 30 cm, con la forma del vidrio</dd>
+          <dt>Archivo</dt><dd>49 × 33 cm (1,5 cm de sobrante por lado)</dd>
+          <dt>Resolución</dt><dd>339 dpi a tamaño real</dd>
+          <dt>Corte</dt><dd>Siguiendo la <span class="corte">línea rosada</span> de la guía de corte. Todo el contenido queda al menos 1,5 cm adentro de esa línea.</dd>
+        </dl>
+        <div class="links">
+          <a class="principal" href="../version-2/descargas/vidrio-lateral-productos-46x30cm-v2.pdf" download>PDF de impresión</a>
+          <a href="../version-2/descargas/vidrio-lateral-productos-46x30cm-v2-guia-de-corte.pdf" download>Guía de corte</a>
+        </div>
+      </div>
+    </article>
+
+    <article class="pieza">
+      <img src="img/equipos-pliego.jpg" alt="Pliego del lateral de equipos apícolas con la línea de corte en rosado" loading="lazy">
+      <div>
+        <h3>3 · Lateral equipos</h3>
+        <p class="donde">Vidrio fijo pequeño trasero, <strong>lado izquierdo</strong> (detrás de la puerta trasera del conductor).</p>
+        <dl>
+          <dt>Medida final</dt><dd>46 × 30 cm, con la forma del vidrio</dd>
+          <dt>Archivo</dt><dd>49 × 33 cm (1,5 cm de sobrante por lado)</dd>
+          <dt>Resolución</dt><dd>339 dpi a tamaño real</dd>
+          <dt>Corte</dt><dd>Siguiendo la <span class="corte">línea rosada</span> de la guía de corte. Es el espejo de la pieza 2.</dd>
+        </dl>
+        <div class="links">
+          <a class="principal" href="../version-2/descargas/vidrio-lateral-equipos-46x30cm-v2.pdf" download>PDF de impresión</a>
+          <a href="../version-2/descargas/vidrio-lateral-equipos-46x30cm-v2-guia-de-corte.pdf" download>Guía de corte</a>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <section aria-labelledby="t-espec">
+    <h2 id="t-espec">Especificaciones de los archivos</h2>
+    <ul class="check">
+      <li><strong>Escala 1:1</strong>: cada PDF está a su tamaño real en centímetros, con 1,5 cm de sobrante por lado.</li>
+      <li><strong>Formato:</strong> PDF de una página con la imagen incrustada en alta calidad (JPEG 95). Los mismos pliegos en JPG vienen en el ZIP.</li>
+      <li><strong>Color:</strong> los archivos vienen en <strong>RGB (sRGB)</strong>. Si su RIP o su máquina trabaja en CMYK, conviértanlos con su propio perfil de impresión.</li>
+      <li><strong>Guías de corte:</strong> son una copia del pliego con el contorno del vidrio en rosado. <strong>No se imprimen</strong>; sirven para cortar.</li>
+      <li>Textos, teléfono (320 856 8248) e Instagram (@flowermiel_) ya están revisados. No modificar.</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="t-inst">
+    <h2 id="t-inst">Material e instalación</h2>
+    <ul class="check">
+      <li><strong>Material:</strong> vinilo microperforado para vidrio (vista desde adentro hacia afuera).</li>
+      <li><strong>Recomendado:</strong> laminado óptico transparente encima, para que el agua no tape las perforaciones y se mantenga la visibilidad cuando llueve.</li>
+      <li>Se instala por la <strong>cara exterior</strong> del vidrio.</li>
+      <li>El vidrio trasero tiene el borde inferior curvo y el limpiabrisas: el recorte final se hace sobre el carro.</li>
+      <li>Confirmar con el cliente que el microperforado en el vidrio trasero cumple la visibilidad exigida por las normas de tránsito.</li>
+    </ul>
+    <div class="nota">
+      <p><strong>Antes de imprimir los laterales:</strong> la forma de los vidrios pequeños se tomó de una foto de perfil de una Duster Dynamique 2021 y se ajustó a 46 × 30 cm.</p>
+      <p>Les pedimos comparar la guía de corte con el vidrio real (por ejemplo, calcando el vidrio en papel). Si hay diferencias, el contenido tiene 1,5 cm de margen al borde para ajustarlo sin perder textos.</p>
+    </div>
+  </section>
+
+  <footer>
+    Cliente: Flower Miel · Samuel González · WhatsApp 320 856 8248.
+  </footer>
+</div>
+</body>
+</html>
