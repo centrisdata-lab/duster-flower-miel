@@ -231,6 +231,7 @@ scene.add(suelo);
 
 // ---------- Materiales ----------
 const pintura = new THREE.MeshPhysicalMaterial({ color: 0xf3f3f1, roughness: 0.32, metalness: 0.0, clearcoat: 1, clearcoatRoughness: 0.08 });
+const pinturaDoble = pintura.clone(); pinturaDoble.side = THREE.DoubleSide;
 const plastico = new THREE.MeshStandardMaterial({ color: 0x1c1c1e, roughness: 0.75 });
 const negroBrillo = new THREE.MeshPhysicalMaterial({ color: 0x111214, roughness: 0.2, clearcoat: 1 });
 const vidrio = new THREE.MeshPhysicalMaterial({ color: 0x0b1116, roughness: 0.04, metalness: 0.3, clearcoat: 1, side: THREE.DoubleSide });
@@ -333,7 +334,7 @@ for (const lado of [1, -1]) {
   const banda = plano(poly([[0.70, 1.10], [-1.80, 1.10], [-1.69, 1.57], [0.03, 1.57]]), marco);
   banda.position.z = lado * (ZC + 0.001); carro.add(banda);
   // tapa de carrocería bajo la puerta trasera y el cuarto (la línea de cintura sube hacia atrás)
-  const cintura = plano(poly([[-0.17, 1.10], [-1.80, 1.10], [-1.76, 1.22], [-0.17, 1.22]]), pintura);
+  const cintura = plano(poly([[-0.17, 1.10], [-1.80, 1.10], [-1.76, 1.22], [-0.17, 1.22]]), pinturaDoble);
   cintura.position.z = lado * (ZC + 0.0015); carro.add(cintura);
   for (const forma of [DEL, CUARTO]) { const m = plano(forma, vidrio); m.position.z = z; carro.add(m); }
   const vt = plano(rect(PUERTA_T.w + 0.02, PUERTA_T.h + 0.02, 0.04), vidrio);
